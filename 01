@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <locale.h>
+
+char nome[200];
+char CPF[11];
+char sexo[2];
+int idade;
+int main();
+
+struct elemento {
+    char pergunta[256];
+    int pontuacao;
+};
+
+struct elemento questoes[] =
+{
+    { .pergunta = "Tem febre: ", .pontuacao = 5},
+    { .pergunta = "Tem dor de cabeça: ", .pontuacao = 1},
+    { .pergunta = "Tem secreção nasal ou espirros: ", .pontuacao = 1},
+    { .pergunta = "Tem dor/ irritação na garganta: ", .pontuacao = 1},
+    { .pergunta = "Tem tosse seca: ", .pontuacao = 3},
+    { .pergunta = "Tem dificuldade respiratória: ", .pontuacao = 10},
+    { .pergunta = "Tem dores no corpo: ", .pontuacao = 1},
+    { .pergunta = "Tem diarréia: ", .pontuacao = 1},
+    { .pergunta = "Esteve em contato, nos últimos 14 dias, com um caso diagnosticado com COVID-19: ", .pontuacao = 10},
+    { .pergunta = "Esteve em locais com grande aglomeração: ", .pontuacao = 3},
+};
+
+void perguntas() {
+    int i = 0;
+    char res;
+    int soma = 0;
+
+    setlocale(LC_ALL, "Portuguese");
+    
+    FILE *arquivoTxt;
+    arquivoTxt = fopen("dataBase.txt", "a");
+    
+    if (arquivoTxt == NULL)
+    {
+        printf("Erro ao criar arquivo.");
+    }
+
+    system("cls");
+    printf("Responda as perguntas abaixo com S (Sim) ou N (Não).\n");
+    printf("----------------------------------------------------\n");
+    for (i = 0; i < 10; i++) {
+        printf("%s", questoes[i].pergunta);
+        scanf("%c", &res);
+        fflush(stdin);
+        fprintf(arquivoTxt, "%s %c\n", questoes[i].pergunta, res);
+        if (res == 'S' || res =='s') {
+            soma = soma + questoes[i].pontuacao;
+        }
+    }
+    fprintf(arquivoTxt, "Pontuação total: %d", soma);
+    fclose(arquivoTxt);
+    
+    system("clr");
+    if (soma >= 0 && soma < 10) {
+        printf("Você somou %d pontos e deve se encaminhar para a ala de Baixo Risco.\n", soma);
+    }
+    if (soma >= 10 && soma < 20) {
+        printf("Você somou %d pontos e deve se encaminhar para a ala de Médio Risco.\n", soma);
+    }
+    if (soma >= 20) {
+        printf("Você somou %d pontos e deve se encaminhar para a ala de Alto Risco.\n", soma);
+    }
+    soma = 0;
+    
+    printf("Pressione ENTER para voltar ao menu principal...");
+    getchar();
+    main();
+}
+
+void cadastrarPaciente ()
+{
+    setlocale(LC_ALL, "Portuguese");
+    FILE *arquivoTxt;
+    arquivoTxt = fopen("dataBase.txt", "a");
+    
+    if (arquivoTxt == NULL)
+    {
+        printf("Erro ao criar arquivo.");
+    }
+    
+    printf("Informe o nome do paciente: \n");
+    scanf("%s", &nome);
+    fflush(stdin);
+    
+    printf("Informe o CPF do paciente: \n");
+    scanf("%s", &CPF);
+    fflush(stdin);
+    
+    printf("Informe o sexo do paciente (M/ F): \n");
+    scanf("%s", &sexo);
+    fflush(stdin);
+    
+    printf("Informe o idade do paciente: \n");
+    scanf("%i", &idade);
+    fflush(stdin);
+    
+    fprintf(arquivoTxt, "Nome: %s\nCPF: %s\nSexo: %s\nIdade: %d", nome, CPF, sexo, idade);
+    fclose(arquivoTxt);
+    printf("Dados gravados com sucesso\n");
+    getchar();
+    perguntas();
+}
+
+int main () {
+    
+    int opcao;
+    
+    printf("-----MENU-----\n");
+    printf("1. Cadastrar paciente.\n");
+    printf("0. Sair.\n");
+    printf("Por favor, selecione uma opção.\n");
+    scanf("%i", &opcao);
+    fflush(stdin);
+    
+    switch(opcao) {
+        case 0:
+            printf("Finalizando o programa...\n");
+            break;
+            
+        case 1:
+            cadastrarPaciente ();
+            break;
+            
+        default:
+            break;
+    }
+}
